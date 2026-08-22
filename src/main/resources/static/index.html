@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps & Task Command Center</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dark-mode">
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="logo-icon">⚡</div>
+                <div class="brand-text">
+                    <h1>DevOps & Task Hub</h1>
+                    <span class="subtitle">Spring Boot 3.5 • Java 17 Microservice</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="health-pill" id="healthPill">
+                    <span class="status-dot"></span>
+                    <span id="healthStatusText">Checking...</span>
+                </div>
+                <button id="themeToggle" class="btn-icon" title="Toggle Theme">🌙</button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="tasksTab">
+                <span class="tab-icon">📋</span> Task Board
+            </button>
+            <button class="nav-tab" data-tab="telemetryTab">
+                <span class="tab-icon">📊</span> System Telemetry
+            </button>
+            <button class="nav-tab" data-tab="apiTab">
+                <span class="tab-icon">🚀</span> API Explorer
+            </button>
+        </nav>
+
+        <!-- TAB 1: Task Board -->
+        <main id="tasksTab" class="tab-content active">
+            <!-- Stats KPIs -->
+            <section class="kpi-grid">
+                <div class="kpi-card" style="border-left: 4px solid #3b82f6;">
+                    <div class="kpi-label">Total Tasks</div>
+                    <div class="kpi-value" id="kpiTotal">0</div>
+                </div>
+                <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
+                    <div class="kpi-label">In Progress</div>
+                    <div class="kpi-value" id="kpiInProgress">0</div>
+                </div>
+                <div class="kpi-card" style="border-left: 4px solid #10b981;">
+                    <div class="kpi-label">Completed</div>
+                    <div class="kpi-value" id="kpiDone">0</div>
+                </div>
+                <div class="kpi-card" style="border-left: 4px solid #ef4444;">
+                    <div class="kpi-label">Critical / High</div>
+                    <div class="kpi-value" id="kpiCritical">0</div>
+                </div>
+            </section>
+
+            <!-- Action & Filter Bar -->
+            <section class="toolbar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search tasks, descriptions, or assignees...">
+                </div>
+                <div class="filter-controls">
+                    <select id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="TODO">To Do</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="DONE">Done</option>
+                    </select>
+                    <select id="priorityFilter">
+                        <option value="">All Priorities</option>
+                        <option value="CRITICAL">Critical</option>
+                        <option value="HIGH">High</option>
+                        <option value="MEDIUM">Medium</option>
+                        <option value="LOW">Low</option>
+                    </select>
+                    <button id="btnNewTask" class="btn btn-primary">+ New Task</button>
+                </div>
+            </section>
+
+            <!-- Tasks Container -->
+            <section id="tasksList" class="tasks-grid">
+                <div class="loading-state">Loading tasks...</div>
+            </section>
+        </main>
+
+        <!-- TAB 2: System Telemetry -->
+        <section id="telemetryTab" class="tab-content">
+            <div class="telemetry-header">
+                <h2>JVM & System Telemetry</h2>
+                <div class="telemetry-refresh">
+                    <button id="btnRefreshMetrics" class="btn btn-secondary">↻ Refresh Metrics</button>
+                </div>
+            </div>
+
+            <div class="telemetry-grid">
+                <!-- Memory Card -->
+                <div class="telemetry-card">
+                    <h3>JVM Heap Memory</h3>
+                    <div class="memory-progress-wrapper">
+                        <div class="progress-bar">
+                            <div id="memoryProgressBar" class="progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="memory-legend">
+                            <span id="memUsedText">Used: 0 MB</span>
+                            <span id="memTotalText">Total: 0 MB</span>
+                        </div>
+                    </div>
+                    <p class="stat-highlight" id="memPercentText">0% allocated</p>
+                </div>
+
+                <!-- Runtime Card -->
+                <div class="telemetry-card">
+                    <h3>Application Runtime</h3>
+                    <div class="info-row">
+                        <span class="info-label">Application:</span>
+                        <span class="info-val" id="metricAppName">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Uptime:</span>
+                        <span class="info-val" id="metricUptime">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Status:</span>
+                        <span class="info-val badge-success" id="metricStatus">-</span>
+                    </div>
+                </div>
+
+                <!-- Environment Card -->
+                <div class="telemetry-card">
+                    <h3>Host & Java Environment</h3>
+                    <div class="info-row">
+                        <span class="info-label">Java Version:</span>
+                        <span class="info-val" id="metricJavaVersion">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">CPU Cores:</span>
+                        <span class="info-val" id="metricCores">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Active Threads:</span>
+                        <span class="info-val" id="metricThreads">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Operating System:</span>
+                        <span class="info-val" id="metricOS">-</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: API Explorer -->
+        <section id="apiTab" class="tab-content">
+            <div class="api-header">
+                <h2>Interactive REST API Console</h2>
+                <p>Execute live HTTP requests against the backend Spring Boot endpoints directly from the browser.</p>
+            </div>
+
+            <div class="api-console">
+                <div class="api-endpoints-list">
+                    <button class="api-endpoint-btn active" data-method="GET" data-path="/api/tasks" data-body="">
+                        <span class="method-badge get">GET</span> /api/tasks
+                    </button>
+                    <button class="api-endpoint-btn" data-method="GET" data-path="/api/tasks/stats" data-body="">
+                        <span class="method-badge get">GET</span> /api/tasks/stats
+                    </button>
+                    <button class="api-endpoint-btn" data-method="GET" data-path="/api/health" data-body="">
+                        <span class="method-badge get">GET</span> /api/health
+                    </button>
+                    <button class="api-endpoint-btn" data-method="GET" data-path="/api/system/metrics" data-body="">
+                        <span class="method-badge get">GET</span> /api/system/metrics
+                    </button>
+                    <button class="api-endpoint-btn" data-method="POST" data-path="/api/tasks" data-body='{"title":"Setup Helm Charts","description":"Package microservices with Helm for Kubernetes deployment","priority":"HIGH","status":"TODO","assignee":"DevOps Engineer","tags":["helm","k8s"]}'>
+                        <span class="method-badge post">POST</span> /api/tasks
+                    </button>
+                </div>
+
+                <div class="api-runner">
+                    <div class="request-bar">
+                        <span class="method-indicator" id="currentMethod">GET</span>
+                        <input type="text" id="apiEndpointInput" value="/api/tasks">
+                        <button id="btnSendApiRequest" class="btn btn-primary">Send Request</button>
+                    </div>
+
+                    <div class="request-body-section" id="requestBodyContainer" style="display: none;">
+                        <label>Request JSON Body:</label>
+                        <textarea id="apiRequestBody" rows="5"></textarea>
+                    </div>
+
+                    <div class="response-section">
+                        <div class="response-header">
+                            <span>Response (<span id="apiStatusBadge">200 OK</span>)</span>
+                            <span id="apiLatencyText">0 ms</span>
+                        </div>
+                        <pre id="apiResponseViewer">Click "Send Request" to test endpoint...</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal: Add / Edit Task -->
+        <div id="taskModal" class="modal-overlay">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Create New Task</h3>
+                    <button class="btn-close" id="btnCloseModal">&times;</button>
+                </div>
+                <form id="taskForm">
+                    <input type="hidden" id="taskId">
+                    
+                    <div class="form-group">
+                        <label for="taskTitleInput">Task Title *</label>
+                        <input type="text" id="taskTitleInput" required placeholder="e.g. Implement OAuth2 Authentication">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskDescriptionInput">Description</label>
+                        <textarea id="taskDescriptionInput" rows="3" placeholder="Describe the task details..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskPriorityInput">Priority</label>
+                            <select id="taskPriorityInput">
+                                <option value="LOW">Low</option>
+                                <option value="MEDIUM" selected>Medium</option>
+                                <option value="HIGH">High</option>
+                                <option value="CRITICAL">Critical</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskStatusInput">Status</label>
+                            <select id="taskStatusInput">
+                                <option value="TODO" selected>To Do</option>
+                                <option value="IN_PROGRESS">In Progress</option>
+                                <option value="DONE">Done</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskAssigneeInput">Assignee</label>
+                            <input type="text" id="taskAssigneeInput" placeholder="e.g. DevOps Engineer">
+                        </div>
+                        <div class="form-group">
+                            <label for="taskTagsInput">Tags (comma separated)</label>
+                            <input type="text" id="taskTagsInput" placeholder="k8s, docker, cicd">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="btnCancelModal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="btnSaveTask">Save Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
