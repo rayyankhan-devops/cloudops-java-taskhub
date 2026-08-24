@@ -17,13 +17,13 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      # Snyk requires dependencies to be downloaded/built to analyze the Maven graph accurately
       - name: Build with Maven
-        run: mvn clean install -DskipTests
+        run: mvn clean package -DskipTests
+
+      - name: Install Snyk CLI
+        uses: snyk/actions/setup@master
 
       - name: Run Snyk SCA Scan
-        uses: snyk/actions/maven@master
+        run: snyk test --severity-threshold=high
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
