@@ -1,12 +1,14 @@
-name: Master Ci-java-cloudops workflow
+name: Master CI - Java CloudOps
 
 on:
   push:
     branches:
       - main
+
   pull_request:
     branches:
       - main
+
   workflow_dispatch:
 
 permissions:
@@ -15,15 +17,25 @@ permissions:
   security-events: write
 
 jobs:
+
+  # ─────────────────────────────────────────────
+  # 1. Secret Detection
+  # ─────────────────────────────────────────────
   gitleak-scan:
     name: 1. Secret Scan
     uses: ./.github/workflows/gitleak-scan.yml
 
+  # ─────────────────────────────────────────────
+  # 2. Code Quality / Linting
+  # ─────────────────────────────────────────────
   linting:
     name: 2. Linting
     needs: gitleak-scan
     uses: ./.github/workflows/lint.yml
 
+  # ─────────────────────────────────────────────
+  # 3. CodeQL - SAST
+  # ─────────────────────────────────────────────
   codeql-analysis:
     name: 3. CodeQL Analysis
     needs: linting
@@ -33,20 +45,32 @@ jobs:
       security-events: write
     uses: ./.github/workflows/code-quality.yml
 
+  # ─────────────────────────────────────────────
+  # 4. Snyk - Software Composition Analysis
+  # ─────────────────────────────────────────────
   snyk-scan:
     name: 4. Snyk SCA Scan
-    needs: codeql-analysis
+    needs: linting
     uses: ./.github/workflows/sca.yml
     secrets: inherit
 
+  # ─────────────────────────────────────────────
+  # 5. SonarQube - Code Quality & Security
+  # ─────────────────────────────────────────────
   sonarqube-analysis:
     name: 5. SonarQube Analysis
-    needs: snyk-scan
+    needs: linting
     uses: ./.github/workflows/sonarqube.yml
     secrets: inherit
 
+  # ─────────────────────────────────────────────
+  # 6. Docker Build, Scan & Push
+  # ─────────────────────────────────────────────
   docker-build-scan-push:
-    name: 5. Docker Build, Scan, and Push
-    needs: [gitleak-scan,linting,codeql-analysis,sonarqube-analysis,snyk-scan]
+    name: 6. Docker Build, Scan & Push
+    needs:
+      - codeql-analysis
+      - snyk-scan
+      - sonarqube-analysis
     uses: ./.github/workflows/docker-build.yml
     secrets: inherit
