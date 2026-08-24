@@ -1,0 +1,29 @@
+name: Java Maven 17 SCA Scan
+
+on:
+  workflow_call:
+
+jobs:
+  snyk-sca:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # Snyk requires dependencies to be downloaded/built to analyze the Maven graph accurately
+      - name: Build with Maven
+        run: mvn clean install -DskipTests
+
+      - name: Run Snyk SCA Scan
+        uses: snyk/actions/maven@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
