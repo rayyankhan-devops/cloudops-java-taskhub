@@ -9,33 +9,21 @@ on:
     branches:
       - main
 
-  workflow_dispatch:
-
 permissions:
   actions: read
   contents: read
   security-events: write
 
 jobs:
-
-  # ─────────────────────────────────────────────
-  # 1. Secret Detection
-  # ─────────────────────────────────────────────
   gitleak-scan:
     name: 1. Secret Scan
     uses: ./.github/workflows/gitleak-scan.yml
 
-  # ─────────────────────────────────────────────
-  # 2. Code Quality / Linting
-  # ─────────────────────────────────────────────
   linting:
     name: 2. Linting
     needs: gitleak-scan
     uses: ./.github/workflows/lint.yml
 
-  # ─────────────────────────────────────────────
-  # 3. CodeQL - SAST
-  # ─────────────────────────────────────────────
   codeql-analysis:
     name: 3. CodeQL Analysis
     needs: linting
@@ -45,31 +33,28 @@ jobs:
       security-events: write
     uses: ./.github/workflows/code-quality.yml
 
-  # ─────────────────────────────────────────────
-  # 4. Snyk - Software Composition Analysis
-  # ─────────────────────────────────────────────
   snyk-scan:
     name: 4. Snyk SCA Scan
     needs: linting
     uses: ./.github/workflows/sca.yml
     secrets: inherit
 
-  # ─────────────────────────────────────────────
-  # 5. SonarQube - Code Quality & Security
-  # ─────────────────────────────────────────────
   sonarqube-analysis:
     name: 5. SonarQube Analysis
     needs: linting
     uses: ./.github/workflows/sonarqube.yml
     secrets: inherit
 
-  # ─────────────────────────────────────────────
-  # 6. Docker Build, Scan & Push
-  # ─────────────────────────────────────────────
+  hadolint:
+    name: Hadolint
+    needs: linting
+    uses: ./.github/workflows/hadolint.yml
+
   docker-build-scan-push:
     name: 6. Docker Build, Scan & Push
     needs:
       - codeql-analysis
+      - hadolint
       - snyk-scan
       - sonarqube-analysis
     uses: ./.github/workflows/docker-build.yml
