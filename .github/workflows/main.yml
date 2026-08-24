@@ -1,25 +1,40 @@
 name: Master Ci-java-cloudops workflow
 
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
 
 jobs:
-    gitleak-scan:
-      uses: ./.github/workflows/gitleak-scan.yml
-    
-    linting:
-      needs: gitleak-scan
-      uses: ./.github/workflows/lint.yml
+  gitleak-scan:
+    name: 1. Secret Scan
+    uses: ./.github/workflows/gitleak-scan.yml
 
-    codeql-analysis:
-      needs: linting
-      uses: ./.github/workflows/code-quality.yml
+  linting:
+    name: 2. Linting
+    needs: gitleak-scan
+    uses: ./.github/workflows/lint.yml
 
-    snyk-scan:
-      needs: codeql-analysis
-      uses: ./.github/workflows/sca.yml
+  codeql-analysis:
+    name: 3. CodeQL Analysis
+    needs: linting
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    uses: ./.github/workflows/code-quality.yml
+
+  snyk-scan:
+    name: 4. Snyk SCA Scan
+    needs: codeql-analysis
+    uses: ./.github/workflows/sca.yml
+    secrets: inherit
