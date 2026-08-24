@@ -44,3 +44,9 @@ jobs:
     needs: snyk-scan
     uses: ./.github/workflows/sonarqube.yml
     secrets: inherit
+
+  docker-build-scan-push:
+    name: 5. Docker Build, Scan, and Push
+    needs: [gitleak-scan,linting,codeql-analysis,sonarqube-analysis,snyk-scan]
+    uses: ./.github/workflows/docker-build.yml
+    secrets: inherit
