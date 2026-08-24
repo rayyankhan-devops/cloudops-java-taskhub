@@ -1,0 +1,8 @@
+services:
+  cloudops-java:
+    image: rayyan12311/cloudops-java-taskhub:v1.0.0
+    pull_policy: missing
+    container_name: cloudops-java
+    ports:
+      - "8080:8080"
+    

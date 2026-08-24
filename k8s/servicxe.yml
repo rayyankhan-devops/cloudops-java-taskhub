@@ -1,0 +1,14 @@
+kind: Service 
+apiVersion: v1
+
+metadata:
+  name: cloudops-dep
+  namespace: cloudops
+
+spec:
+  selector:
+    app: cloudops
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
