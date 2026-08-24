@@ -1,0 +1,16 @@
+name: Master Ci-java-cloudops workflow
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    - name: gitleak-scan
+      uses: ./.github/workflows/gitleak-scan.yml
+    
+    - name: linting
+      uses: ./.github/workflows/lint.yml
