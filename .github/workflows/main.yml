@@ -15,3 +15,11 @@ jobs:
     linting:
       needs: gitleak-scan
       uses: ./.github/workflows/lint.yml
+
+    codeql-analysis:
+      needs: linting
+      uses: ./.github/workflows/code-quality.yml
+
+    snyk-scan:
+      needs: codeql-analysis
+      uses: ./.github/workflows/sca.yml
