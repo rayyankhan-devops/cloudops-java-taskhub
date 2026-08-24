@@ -9,8 +9,9 @@ on:
             - main
 
 jobs:
-    - name: gitleak-scan
+    gitleak-scan:
       uses: ./.github/workflows/gitleak-scan.yml
     
-    - name: linting
+    linting:
+      needs: gitleak-scan
       uses: ./.github/workflows/lint.yml
