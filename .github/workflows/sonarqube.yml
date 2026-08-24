@@ -31,8 +31,11 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL || 'https://sonarcloud.io' }}
+          SONAR_ORG: ${{ secrets.SONAR_ORGANIZATION || 'rayyankhan-devops' }}
         run: |
           mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-            -Dsonar.projectKey=cloudops-java-taskhub \
-            -Dsonar.projectName="CloudOps Java TaskHub" \
-            -Dsonar.host.url="${SONAR_HOST_URL}"
+            -Dsonar.token="${SONAR_TOKEN}" \
+            -Dsonar.host.url="${SONAR_HOST_URL}" \
+            -Dsonar.organization="${SONAR_ORG}" \
+            -Dsonar.projectKey=rayyankhan-devops_cloudops-java-taskhub \
+            -Dsonar.projectName="CloudOps Java TaskHub"
