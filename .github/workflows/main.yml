@@ -38,3 +38,9 @@ jobs:
     needs: codeql-analysis
     uses: ./.github/workflows/sca.yml
     secrets: inherit
+
+  sonarqube-analysis:
+    name: 5. SonarQube Analysis
+    needs: snyk-scan
+    uses: ./.github/workflows/sonarqube.yml
+    secrets: inherit
